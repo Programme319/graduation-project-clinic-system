@@ -1,0 +1,884 @@
+{
+  "project": {
+    "name": "Clinic Management System",
+    "type": "Medical Clinic Management Application",
+    "version": "1.0.0",
+    "description": "A comprehensive medical clinic management system with patient records, medical investigations, medications tracking, and AI-powered medical assistant chatbot",
+    "author": "Development Team",
+    "license": "MIT",
+    "status": "Active Development"
+  },
+  "overview": {
+    "purpose": "Manage patient records, medical data, and provide AI-powered medical guidance to patients",
+    "target_users": [
+      "Doctors",
+      "Pharmacists",
+      "Clinic Staff",
+      "Patients"
+    ],
+    "primary_features": [
+      "Patient Record Management",
+      "Medical Investigations Tracking",
+      "Medication Prescription Management",
+      "Multi-User System",
+      "AI Medical Assistant Chatbot",
+      "Patient Search & Filtering"
+    ],
+    "language": "Arabic & English",
+    "deployment_target": "Small to Medium Clinics"
+  },
+  "features": {
+    "patient_management": {
+      "title": "Patient Management Module",
+      "capabilities": [
+        {
+          "feature": "Create Patient Records",
+          "description": "Add new patient with comprehensive medical information",
+          "fields": [
+            "full_name",
+            "national_id (14 digits, unique)",
+            "age",
+            "clinic_code",
+            "complaint",
+            "diagnosis_text",
+            "doctor_name",
+            "pharmacist_name"
+          ]
+        },
+        {
+          "feature": "View Patient List",
+          "description": "Display all patients with pagination and sorting",
+          "route": "/patients"
+        },
+        {
+          "feature": "Search Patients",
+          "description": "Search by name or national ID",
+          "search_fields": ["full_name", "national_id"]
+        },
+        {
+          "feature": "View Patient Details",
+          "description": "Display complete patient information with investigations and medications",
+          "route": "/patient/{id}",
+          "includes": ["investigations", "medications"]
+        }
+      ]
+    },
+    "medical_data_tracking": {
+      "title": "Medical Data Management",
+      "investigations": {
+        "description": "Track laboratory tests and medical investigations",
+        "fields": ["test_code", "test_name", "test_result"],
+        "model": "PatientInvestigation"
+      },
+      "medications": {
+        "description": "Track prescribed medications",
+        "fields": ["med_code", "med_name", "dosage"],
+        "model": "PatientMedication"
+      },
+      "database_transactions": "All data saved atomically (all or nothing)"
+    },
+    "user_management": {
+      "title": "Multi-User System",
+      "capabilities": [
+        "Create new clinic staff members",
+        "Edit user profiles",
+        "Delete user accounts",
+        "User authentication and verification"
+      ],
+      "roles": [
+        "Doctor",
+        "Pharmacist",
+        "Clinic Staff",
+        "Administrator"
+      ]
+    },
+    "ai_chatbot": {
+      "title": "AI-Powered Medical Assistant",
+      "description": "Intelligent chatbot providing patient medical guidance",
+      "capabilities": [
+        "Answer patient health questions",
+        "Use patient medical history context",
+        "Provide supportive medical advice",
+        "Encourage doctor follow-ups",
+        "Recognize emergency situations"
+      ],
+      "ai_provider": "Ollama Cloud",
+      "ai_model": "qwen3-coder:30b (configurable)",
+      "language_support": "Arabic",
+      "features": [
+        "Patient-specific context awareness",
+        "Safe medical guidance (no diagnosis)",
+        "Arabic language responses",
+        "Patient privacy protection (public info only)",
+        "Emergency situation detection"
+      ],
+      "endpoints": [
+        {
+          "method": "POST",
+          "route": "/api/chat",
+          "description": "Send message to AI chatbot",
+          "parameters": ["patient_id", "message"]
+        },
+        {
+          "method": "GET",
+          "route": "/api/patient/{patientId}",
+          "description": "Get patient public info for chatbot"
+        }
+      ]
+    }
+  },
+  "technology_stack": {
+    "backend": {
+      "language": "PHP",
+      "version": "8.2+",
+      "framework": {
+        "name": "Laravel",
+        "version": "12.0",
+        "features": [
+          "Routing Engine",
+          "Dependency Injection Container",
+          "ORM (Eloquent)",
+          "Database Migrations",
+          "Background Job Processing",
+          "Event Broadcasting"
+        ]
+      },
+      "database": {
+        "default": "SQLite",
+        "supported": ["SQLite", "MySQL", "PostgreSQL"],
+        "orm": "Eloquent"
+      },
+      "authentication": {
+        "provider": "Laravel Sanctum",
+        "version": "4.0",
+        "features": ["API Token Authentication", "Session Management"]
+      },
+      "additional_packages": [
+        {
+          "name": "laravel/breeze",
+          "version": "2.4",
+          "purpose": "Authentication scaffolding"
+        },
+        {
+          "name": "inertiajs/inertia-laravel",
+          "version": "2.0",
+          "purpose": "Server-driven React components"
+        },
+        {
+          "name": "openai-php/client",
+          "version": "0.20.0",
+          "purpose": "AI API integration"
+        },
+        {
+          "name": "tightenco/ziggy",
+          "version": "2.0",
+          "purpose": "Named routes in JavaScript"
+        },
+        {
+          "name": "laravel/tinker",
+          "version": "2.10.1",
+          "purpose": "REPL for Laravel"
+        }
+      ]
+    },
+    "frontend": {
+      "framework": {
+        "name": "React",
+        "version": "18.2.0"
+      },
+      "build_tool": {
+        "name": "Vite",
+        "version": "7.0.7"
+      },
+      "http_client": {
+        "name": "Axios",
+        "version": "1.11.0"
+      },
+      "styling": {
+        "css_framework": {
+          "name": "Tailwind CSS",
+          "version": "3.2.1",
+          "plugins": [
+            {
+              "name": "@tailwindcss/forms",
+              "version": "0.5.3"
+            },
+            {
+              "name": "@tailwindcss/vite",
+              "version": "4.0.0"
+            }
+          ]
+        },
+        "tools": [
+          {
+            "name": "PostCSS",
+            "version": "8.4.31"
+          },
+          {
+            "name": "Autoprefixer",
+            "version": "10.4.12"
+          }
+        ]
+      },
+      "component_libraries": [
+        {
+          "name": "@headlessui/react",
+          "version": "2.0.0",
+          "purpose": "Unstyled, accessible components"
+        }
+      ],
+      "inertia": {
+        "package": "@inertiajs/react",
+        "version": "2.0.0",
+        "purpose": "Server-driven React components"
+      },
+      "plugins": [
+        {
+          "name": "@vitejs/plugin-react",
+          "version": "4.2.0"
+        },
+        {
+          "name": "laravel-vite-plugin",
+          "version": "2.0.0"
+        }
+      ]
+    },
+    "ai_integration": {
+      "provider": "Ollama Cloud",
+      "api_type": "OpenAI-compatible Chat API",
+      "default_model": "qwen3-coder:30b",
+      "http_client": "Guzzle HTTP",
+      "configuration": {
+        "base_url": "https://ollama.com/api",
+        "timeout": "60 seconds",
+        "auth": "Bearer Token"
+      }
+    },
+    "development_tools": {
+      "php": [
+        {
+          "name": "Laravel Pint",
+          "version": "1.24",
+          "purpose": "PHP Code Linter"
+        },
+        {
+          "name": "PHPUnit",
+          "version": "11.5.50",
+          "purpose": "Unit Testing"
+        }
+      ],
+      "javascript": [
+        {
+          "name": "npm",
+          "purpose": "JavaScript Package Manager"
+        },
+        {
+          "name": "concurrently",
+          "version": "9.0.1",
+          "purpose": "Run multiple commands concurrently"
+        }
+      ],
+      "development_server": "Laravel Artisan + Vite"
+    }
+  },
+  "database": {
+    "default_connection": "SQLite",
+    "tables": [
+      {
+        "name": "users",
+        "purpose": "System users (doctors, staff, admin)",
+        "fields": ["id", "name", "email", "password", "email_verified_at", "timestamps"]
+      },
+      {
+        "name": "patients",
+        "purpose": "Patient records and medical information",
+        "fields": [
+          {
+            "name": "id",
+            "type": "bigint",
+            "description": "Ticket Number (رقم التذكرة)"
+          },
+          {
+            "name": "full_name",
+            "type": "string",
+            "description": "Patient full name (اسم المريض)"
+          },
+          {
+            "name": "national_id",
+            "type": "string(14)",
+            "description": "National ID unique (الرقم القومي)",
+            "constraint": "unique"
+          },
+          {
+            "name": "age",
+            "type": "integer",
+            "description": "Patient age (العمر)"
+          },
+          {
+            "name": "clinic_code",
+            "type": "string",
+            "description": "Clinic code (العيادة)",
+            "nullable": true
+          },
+          {
+            "name": "complaint",
+            "type": "text",
+            "description": "Chief complaint (شكوى المريض)",
+            "nullable": true
+          },
+          {
+            "name": "diagnosis_text",
+            "type": "text",
+            "description": "Medical diagnosis (التشخيص)",
+            "nullable": true
+          },
+          {
+            "name": "doctor_name",
+            "type": "string",
+            "description": "Treating doctor (اسم الطبيب)",
+            "nullable": true
+          },
+          {
+            "name": "pharmacist_name",
+            "type": "string",
+            "description": "Pharmacist name (اسم الصيدلي)",
+            "nullable": true
+          },
+          {
+            "name": "timestamps",
+            "type": "datetime",
+            "description": "Created and updated timestamps"
+          }
+        ]
+      },
+      {
+        "name": "patient_investigations",
+        "purpose": "Laboratory tests and medical investigations",
+        "fields": [
+          {
+            "name": "id",
+            "type": "bigint"
+          },
+          {
+            "name": "patient_id",
+            "type": "bigint",
+            "foreign_key": "patients.id"
+          },
+          {
+            "name": "test_code",
+            "type": "string",
+            "description": "Test/Investigation code"
+          },
+          {
+            "name": "test_name",
+            "type": "string",
+            "description": "Test name"
+          },
+          {
+            "name": "test_result",
+            "type": "text",
+            "description": "Test result"
+          },
+          {
+            "name": "timestamps",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "name": "patient_medications",
+        "purpose": "Prescribed medications",
+        "fields": [
+          {
+            "name": "id",
+            "type": "bigint"
+          },
+          {
+            "name": "patient_id",
+            "type": "bigint",
+            "foreign_key": "patients.id"
+          },
+          {
+            "name": "med_code",
+            "type": "string",
+            "description": "Medication code"
+          },
+          {
+            "name": "med_name",
+            "type": "string",
+            "description": "Medication name"
+          },
+          {
+            "name": "dosage",
+            "type": "string",
+            "description": "Dosage information"
+          },
+          {
+            "name": "timestamps",
+            "type": "datetime"
+          }
+        ]
+      },
+      {
+        "name": "sessions",
+        "purpose": "User session storage"
+      },
+      {
+        "name": "cache",
+        "purpose": "Application cache storage"
+      },
+      {
+        "name": "jobs",
+        "purpose": "Background job queue"
+      }
+    ]
+  },
+  "models": [
+    {
+      "name": "User",
+      "path": "app/Models/User.php",
+      "purpose": "System user model",
+      "relationships": []
+    },
+    {
+      "name": "Patient",
+      "path": "app/Models/Patient.php",
+      "purpose": "Patient information model",
+      "fields": [
+        "full_name",
+        "national_id",
+        "age",
+        "clinic_code",
+        "complaint",
+        "diagnosis_text",
+        "doctor_name",
+        "pharmacist_name"
+      ],
+      "relationships": [
+        {
+          "type": "hasMany",
+          "related_model": "PatientInvestigation",
+          "method": "investigations"
+        },
+        {
+          "type": "hasMany",
+          "related_model": "PatientMedication",
+          "method": "medications"
+        }
+      ]
+    },
+    {
+      "name": "PatientInvestigation",
+      "path": "app/Models/PatientInvestigation.php",
+      "purpose": "Medical investigation/test model",
+      "fields": ["test_code", "test_name", "test_result"],
+      "relationships": [
+        {
+          "type": "belongsTo",
+          "related_model": "Patient"
+        }
+      ]
+    },
+    {
+      "name": "PatientMedication",
+      "path": "app/Models/PatientMedication.php",
+      "purpose": "Medication prescription model",
+      "fields": ["med_code", "med_name", "dosage"],
+      "relationships": [
+        {
+          "type": "belongsTo",
+          "related_model": "Patient"
+        }
+      ]
+    }
+  ],
+  "controllers": [
+    {
+      "name": "PatientController",
+      "path": "app/Http/Controllers/PatientController.php",
+      "methods": [
+        {
+          "name": "store",
+          "route": "POST /patient/store",
+          "purpose": "Create and save patient with investigations and medications",
+          "validation": [
+            "full_name: required, string, max:255",
+            "national_id: required, string, size:14, unique:patients",
+            "age: required, integer",
+            "diagnosis_text: nullable, string"
+          ],
+          "features": ["Database Transaction", "Data Validation", "Batch Save"]
+        },
+        {
+          "name": "index",
+          "route": "GET /patients",
+          "purpose": "List all patients with search functionality",
+          "search_by": ["full_name", "national_id"]
+        },
+        {
+          "name": "show",
+          "route": "GET /patient/{patient}",
+          "purpose": "Display patient details with investigations and medications"
+        }
+      ]
+    },
+    {
+      "name": "ChatbotController",
+      "path": "app/Http/Controllers/ChatbotController.php",
+      "methods": [
+        {
+          "name": "chat",
+          "route": "POST /api/chat",
+          "purpose": "Handle patient queries with AI assistant",
+          "parameters": {
+            "patient_id": "integer, exists:patients,id",
+            "message": "string, max:2000"
+          },
+          "response": {
+            "success": "boolean",
+            "reply": "AI response text"
+          }
+        },
+        {
+          "name": "getPatient",
+          "route": "GET /api/patient/{patientId}",
+          "purpose": "Get patient public information for chatbot",
+          "public_fields": [
+            "id",
+            "full_name",
+            "age",
+            "diagnosis_text",
+            "doctor_name",
+            "complaint"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ProfileController",
+      "path": "app/Http/Controllers/ProfileController.php",
+      "methods": [
+        {
+          "name": "create_user",
+          "route": "GET /users/create",
+          "purpose": "Show form to create new clinic staff member"
+        },
+        {
+          "name": "store_user",
+          "route": "POST /users/store",
+          "purpose": "Save new user/staff member"
+        },
+        {
+          "name": "edit",
+          "route": "GET /profile",
+          "purpose": "Show user profile edit form"
+        },
+        {
+          "name": "update",
+          "route": "PATCH /profile",
+          "purpose": "Update user profile"
+        },
+        {
+          "name": "destroy",
+          "route": "DELETE /profile",
+          "purpose": "Delete user account"
+        }
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "path": "/",
+      "method": "GET",
+      "name": "root",
+      "description": "Redirect to login page",
+      "authentication": "public"
+    },
+    {
+      "path": "/dashboard",
+      "method": "GET",
+      "name": "dashboard",
+      "description": "Redirect to patient list",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/patients",
+      "method": "GET",
+      "name": "patient.index",
+      "controller": "PatientController@index",
+      "description": "View all patients with search",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/patient/create",
+      "method": "GET",
+      "name": "patient.create",
+      "description": "Show create patient form",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/patient/store",
+      "method": "POST",
+      "name": "patient.store",
+      "controller": "PatientController@store",
+      "description": "Save new patient with tests and medications",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/patient/{patient}",
+      "method": "GET",
+      "name": "patient.show",
+      "controller": "PatientController@show",
+      "description": "View patient details",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/users/create",
+      "method": "GET",
+      "name": "users.create",
+      "controller": "ProfileController@create_user",
+      "description": "Show create new staff form",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/users/store",
+      "method": "POST",
+      "name": "users.store",
+      "controller": "ProfileController@store_user",
+      "description": "Save new staff member",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/profile",
+      "method": "GET",
+      "name": "profile.edit",
+      "controller": "ProfileController@edit",
+      "description": "Edit user profile",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/profile",
+      "method": "PATCH",
+      "name": "profile.update",
+      "controller": "ProfileController@update",
+      "description": "Update user profile",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/profile",
+      "method": "DELETE",
+      "name": "profile.destroy",
+      "controller": "ProfileController@destroy",
+      "description": "Delete user account",
+      "authentication": "auth_verified"
+    },
+    {
+      "path": "/api/chat",
+      "method": "POST",
+      "name": "api.chat",
+      "controller": "ChatbotController@chat",
+      "description": "AI chatbot endpoint",
+      "authentication": "public",
+      "parameters": {
+        "patient_id": "required, integer",
+        "message": "required, string"
+      }
+    },
+    {
+      "path": "/api/patient/{patientId}",
+      "method": "GET",
+      "name": "api.patient",
+      "controller": "ChatbotController@getPatient",
+      "description": "Get patient info for chatbot",
+      "authentication": "public"
+    }
+  ],
+  "security": [
+    {
+      "feature": "Authentication",
+      "description": "Login verification required for protected routes",
+      "implementation": "Laravel Sanctum + Session Management"
+    },
+    {
+      "feature": "Email Verification",
+      "description": "Users must verify email address",
+      "implementation": "Laravel Built-in Verification"
+    },
+    {
+      "feature": "Data Validation",
+      "description": "Strict input validation on all endpoints",
+      "rules": [
+        "National ID: exactly 14 digits, unique",
+        "Age: integer only",
+        "Message length: max 2000 characters",
+        "Name fields: max 255 characters"
+      ]
+    },
+    {
+      "feature": "Database Transactions",
+      "description": "All-or-nothing data integrity",
+      "use_case": "Patient creation with investigations and medications"
+    },
+    {
+      "feature": "Password Hashing",
+      "algorithm": "Bcrypt",
+      "rounds": 12
+    },
+    {
+      "feature": "API Rate Limiting",
+      "description": "Prevent abuse of API endpoints"
+    },
+    {
+      "feature": "CSRF Protection",
+      "description": "Cross-Site Request Forgery protection"
+    },
+    {
+      "feature": "Data Privacy",
+      "description": "Chatbot only receives public patient information"
+    }
+  ],
+  "configuration": {
+    "environment": {
+      "APP_NAME": "Clinic System",
+      "APP_ENV": "local|production",
+      "APP_DEBUG": "true|false",
+      "APP_URL": "http://localhost"
+    },
+    "database": {
+      "DB_CONNECTION": "sqlite|mysql|pgsql",
+      "DB_HOST": "127.0.0.1",
+      "DB_PORT": 3306,
+      "DB_DATABASE": "clinic",
+      "DB_USERNAME": "root",
+      "DB_PASSWORD": ""
+    },
+    "session": {
+      "SESSION_DRIVER": "database",
+      "SESSION_LIFETIME": "120 minutes",
+      "SESSION_ENCRYPT": false
+    },
+    "queue": {
+      "QUEUE_CONNECTION": "database"
+    },
+    "cache": {
+      "CACHE_STORE": "database"
+    },
+    "ai": {
+      "OLLAMA_API_KEY": "required",
+      "OLLAMA_BASE_URL": "https://ollama.com/api",
+      "OLLAMA_MODEL": "qwen3-coder:30b"
+    },
+    "mail": {
+      "MAIL_MAILER": "smtp|log",
+      "MAIL_HOST": "127.0.0.1",
+      "MAIL_PORT": 2525,
+      "MAIL_FROM_ADDRESS": "hello@example.com"
+    }
+  },
+  "setup_and_development": {
+    "installation": [
+      "composer install",
+      "cp .env.example .env",
+      "php artisan key:generate",
+      "php artisan migrate",
+      "npm install",
+      "npm run build"
+    ],
+    "development_commands": {
+      "dev": "npm run dev - Starts Vite dev server with Laravel",
+      "build": "npm run build - Build for production",
+      "test": "composer test - Run PHPUnit tests"
+    },
+    "development_server": "php artisan serve - Runs on http://localhost:8000"
+  },
+  "file_structure": {
+    "app": {
+      "Http/Controllers": "Application controllers",
+      "Http/Middleware": "Custom middleware",
+      "Http/Requests": "Form request validation",
+      "Models": "Eloquent models",
+      "Services": "Business logic services",
+      "Providers": "Service providers"
+    },
+    "resources": {
+      "js": "React components and frontend logic",
+      "css": "Tailwind CSS styles",
+      "views": "Blade templates (if used)"
+    },
+    "routes": "Route definitions (web.php, api.php, auth.php)",
+    "database": {
+      "migrations": "Database schema changes",
+      "seeders": "Database seed data",
+      "factories": "Model factories for testing"
+    },
+    "config": "Application configuration files",
+    "storage": "Files, logs, and cache storage",
+    "tests": "Test suite files"
+  },
+  "key_services": [
+    {
+      "name": "OllamaService",
+      "path": "app/Services/OllamaService.php",
+      "purpose": "Handle AI chatbot API interactions",
+      "methods": [
+        {
+          "name": "chat",
+          "description": "Send message to Ollama Cloud API and get response",
+          "parameters": ["prompt: string"],
+          "returns": "string (AI response)"
+        }
+      ],
+      "features": [
+        "Guzzle HTTP client",
+        "Bearer token authentication",
+        "Comprehensive error handling",
+        "Detailed logging"
+      ]
+    }
+  ],
+  "frontend_components": [
+    {
+      "name": "ChatWidget",
+      "path": "resources/js/Components/ChatWidget.jsx",
+      "purpose": "Floating AI chatbot widget",
+      "description": "Interactive chat interface for patients to communicate with AI assistant"
+    },
+    {
+      "name": "Patient Pages",
+      "path": "resources/js/Pages/Patient/",
+      "pages": [
+        "Create.jsx - Patient creation form",
+        "Index.jsx - Patient list view",
+        "Show.jsx - Patient details view"
+      ]
+    }
+  ],
+  "performance": {
+    "caching": "Database-based caching system",
+    "database_queries": "Optimized with Eloquent eager loading",
+    "frontend": "Vite for fast HMR (Hot Module Replacement)",
+    "asset_optimization": "Tailwind CSS purging, minification"
+  },
+  "integrations": [
+    {
+      "name": "Ollama Cloud AI",
+      "type": "External API",
+      "purpose": "AI chatbot responses",
+      "authentication": "Bearer Token",
+      "endpoint": "https://ollama.com/api/chat"
+    }
+  ],
+  "language_support": {
+    "primary": "Arabic",
+    "secondary": "English",
+    "character_encoding": "UTF-8",
+    "localization": "Laravel localization support"
+  },
+  "notes": {
+    "development": "Project uses modern Laravel 12 with React and Vite",
+    "ai_integration": "Uses Ollama Cloud for medical AI assistance",
+    "database": "SQLite for development, easily switchable to MySQL/PostgreSQL",
+    "real_time": "Supports WebSocket broadcasting for real-time updates",
+    "testing": "PHPUnit testing framework included"
+  }
+}

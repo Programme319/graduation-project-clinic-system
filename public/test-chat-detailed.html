@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="csrf-token" content="">
+    <title>تشخيص أخطاء الدردشة</title>
+    <style>
+        body { 
+            font-family: Arial; 
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .section { 
+            background: white;
+            margin: 20px 0; 
+            padding: 20px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        input, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        pre { 
+            background: #f9f9f9;
+            padding: 15px; 
+            border-left: 4px solid #667eea;
+            overflow-x: auto;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .error { color: #d32f2f; }
+        .success { color: #388e3c; }
+        .warning { color: #f57c00; }
+    </style>
+</head>
+<body>
+    <h1>🔧 تشخيص مشاكل الدردشة</h1>
+    
+    <div class="section">
+        <h2>الخطوة 1: اختبار البحث عن المريض</h2>
+        <div class="test-form">
+            <input type="number" id="searchPatientId" placeholder="رقم التذكرة" value="1">
+            <button onclick="testSearch()">بحث</button>
+        </div>
+        <pre id="searchResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>الخطوة 2: اختبار الدردشة (مع تفاصيل كاملة)</h2>
+        <div class="test-form">
+            <input type="number" id="chatPatientId" placeholder="رقم المريض" value="1">
+            <input type="text" id="chatMessage" placeholder="الرسالة" value="ما هي نصائحك لحالتي؟">
+            <button onclick="testChat()">إرسال</button>
+        </div>
+        <pre id="chatResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>الخطوة 3: فحص الخادم</h2>
+        <button onclick="checkServer()">فحص صحة الخادم</button>
+        <pre id="serverResult"></pre>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString('ar-SA');
+            const prefix = {
+                'error': '❌',
+                'success': '✅',
+                'warning': '⚠️',
+                'info': 'ℹ️'
+            }[type] || '•';
+            console.log(`[${timestamp}] ${prefix} ${message}`);
+        }
+
+        async function testSearch() {
+            const patientId = document.getElementById('searchPatientId').value;
+            const resultDiv = document.getElementById('searchResult');
+            
+            resultDiv.textContent = 'جاري البحث...';
+            log('Searching for patient ' + patientId);
+            
+            try {
+                const response = await fetch(`/api/patient/${patientId}`);
+                log(`Response status: ${response.status}`);
+                
+                const text = await response.text();
+                log(`Response text length: ${text.length}`);
+                
+                const data = JSON.parse(text);
+                log('Response parsed successfully', 'success');
+                resultDiv.innerHTML = `<span class="success">✅ النتيجة:</span>\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+                resultDiv.innerHTML = `<span class="error">❌ خطأ: ${error.message}</span>`;
+            }
+        }
+
+        async function testChat() {
+            const patientId = document.getElementById('chatPatientId').value;
+            const message = document.getElementById('chatMessage').value;
+            const resultDiv = document.getElementById('chatResult');
+            
+            resultDiv.textContent = 'جاري الإرسال...';
+            log(`Sending chat: patient=${patientId}, message="${message}"`);
+            
+            try {
+                // Get CSRF token
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta?.getAttribute('content') || '';
+                log(`CSRF token: ${csrfToken ? 'موجود' : 'غير موجود'}`, csrfToken ? 'success' : 'warning');
+
+                const body = {
+                    patient_id: parseInt(patientId),
+                    message: message
+                };
+                log(`Request body: ${JSON.stringify(body)}`);
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken || ''
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                log(`Response status: ${response.status} ${response.statusText}`);
+                
+                const text = await response.text();
+                log(`Response length: ${text.length} bytes`);
+                log(`First 100 chars: ${text.substring(0, 100)}`);
+
+                if (!response.ok) {
+                    log(`HTTP error! Status: ${response.status}`, 'error');
+                    resultDiv.innerHTML = `<span class="error">❌ خطأ HTTP ${response.status}</span>\n<pre>${text}</pre>`;
+                    return;
+                }
+
+                const data = JSON.parse(text);
+                log('Response parsed successfully', 'success');
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `<span class="success">✅ نجح!</span>\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.innerHTML = `<span class="warning">⚠️ خطأ:</span>\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+                log(`Error type: ${error.constructor.name}`, 'error');
+                resultDiv.innerHTML = `<span class="error">❌ خطأ:</span>\n${error.message}\n\nافتح Developer Tools (F12) لرؤية المزيد من التفاصيل`;
+            }
+        }
+
+        async function checkServer() {
+            const resultDiv = document.getElementById('serverResult');
+            resultDiv.textContent = 'جاري الفحص...';
+            
+            try {
+                // Try a simple patient request to test server
+                const response = await fetch('/api/patient/1');
+                
+                resultDiv.innerHTML = `<span class="success">✅ الخادم يستجيب:</span>\n`;
+                resultDiv.innerHTML += `Status: ${response.status}\n`;
+                resultDiv.innerHTML += `Headers:\n`;
+                resultDiv.innerHTML += `  Content-Type: ${response.headers.get('Content-Type')}\n`;
+                
+                const text = await response.text();
+                resultDiv.innerHTML += `\nResponse (${text.length} bytes):\n${text}`;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ الخادم لا يستجيب:</span>\n${error.message}`;
+            }
+        }
+
+        // Log page load
+        window.addEventListener('load', () => {
+            log('صفحة التشخيص جاهزة', 'success');
+        });
+    </script>
+</body>
+</html>
