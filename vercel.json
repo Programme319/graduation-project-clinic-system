@@ -15,18 +15,18 @@
     "routes": [
         {
             "src": "/build/(.*)",
-            "dest": "/public/build/$1"
+            "dest": "/build/$1"
         },
         {
             "src": "/robots.txt",
-            "dest": "/public/robots.txt"
+            "dest": "/robots.txt"
         },
         {
             "src": "/(.*\\.(css|js|ico|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|map))",
-            "dest": "/public/$1"
+            "dest": "/$1"
         },
         {
-            "src": "/(.*)",
+            "src": "/(.*? )",
             "dest": "/api/index.php"
         }
     ],
@@ -40,9 +40,9 @@
         "APP_SERVICES_CACHE": "/tmp/services.php",
         "VIEW_COMPILED_PATH": "/tmp/views",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "database",
+        "SESSION_DRIVER": "array",
         "SESSION_SECURE_COOKIE": "true",
-        "CACHE_STORE": "database",
+        "CACHE_STORE": "array",
         "QUEUE_CONNECTION": "sync",
         "DB_SSLMODE": "require"
     }
