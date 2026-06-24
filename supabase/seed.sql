@@ -1,0 +1,2 @@
+-- Optional seed data for local Supabase development.
+-- Add test records here if needed.
