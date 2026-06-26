@@ -1,20 +1,11 @@
 {
     "version": 2,
-    "builds": [
-        {
-            "src": "public/index.php",
-            "use": "@vercel/php"
-        },
-        {
-            "src": "api/index.php",
-            "use": "@vercel/php"
+    "functions": {
+        "public/index.php": {
+            "runtime": "vercel-php@0.6.0"
         }
-    ],
+    },
     "routes": [
-        {
-            "src": "/api/(.*)",
-            "dest": "/api/index.php"
-        },
         {
             "src": "/(.*)",
             "dest": "public/index.php"
@@ -22,7 +13,14 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "false",
-        "APP_URL": "https://your-app-name.vercel.app"
+        "APP_DEBUG": "false"
+    },
+    "build": {
+        "env": {
+            "APP_ENV": "production",
+            "APP_DEBUG": "false",
+            "DB_CONNECTION": "pgsql"
+        },
+        "buildCommand": "bash vercel-build.sh"
     }
 }
