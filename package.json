@@ -3,23 +3,33 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint",
+        "db:push": "drizzle-kit push:pg",
+        "db:migrate": "node scripts/migrate.mjs",
+        "db:studio": "drizzle-kit studio"
     },
     "devDependencies": {
-        "@headlessui/react": "^2.0.0",
-        "@inertiajs/react": "^2.0.0",
-        "@tailwindcss/forms": "^0.5.3",
-        "@tailwindcss/vite": "^4.0.0",
-        "@vitejs/plugin-react": "^4.2.0",
-        "autoprefixer": "^10.4.12",
-        "axios": "^1.11.0",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^2.0.0",
-        "postcss": "^8.4.31",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tailwindcss": "^3.2.1",
-        "vite": "^7.0.7"
+        "@types/node": "^26.0.1",
+        "@types/pg": "^8.20.0",
+        "@types/react": "^19.2.17",
+        "autoprefixer": "^10.5.2",
+        "drizzle-kit": "^0.31.10",
+        "postcss": "^8.5.15",
+        "tailwindcss": "^4.3.1",
+        "typescript": "^6.0.3"
+    },
+    "dependencies": {
+        "axios": "^1.6.2",
+        "better-auth": "^1.6.21",
+        "dotenv": "^17.4.2",
+        "drizzle-orm": "^0.45.2",
+        "next": "^16.2.9",
+        "pg": "^8.22.0",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "zod": "^4.4.3"
     }
 }

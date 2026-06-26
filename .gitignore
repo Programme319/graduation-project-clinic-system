@@ -28,3 +28,15 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Next.js
+/.next/
+/build/
+*.pem
+
+# Drizzle ORM
+drizzle/
+
+# Turbo
+.turbo/
+dist
