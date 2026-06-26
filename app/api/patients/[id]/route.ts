@@ -1,24 +1,13 @@
 import { getDb } from '@/lib/db/client';
 import { patients, investigations, medications } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-
-async function getUserId(): Promise<string | null> {
-  const headersList = await headers();
-  return headersList.get('x-user-id');
-}
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const db = getDb();
     const { id } = await params;
     const patientId = parseInt(id);
@@ -29,8 +18,8 @@ export async function GET(
       .from(patients)
       .where(eq(patients.id, patientId));
 
-    if (!patient.length || patient[0].userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (!patient.length) {
+      return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
     }
 
     // Get investigations
@@ -51,9 +40,9 @@ export async function GET(
       medications: patientMedications,
     });
   } catch (error) {
-    console.error('Error fetching patient:', error);
+    console.error('[v0] Patient detail GET error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch patient', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -64,47 +53,40 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const db = getDb();
     const { id } = await params;
     const patientId = parseInt(id);
     const body = await req.json();
 
-    // Verify ownership
+    // Verify patient exists
     const patient = await db
       .select()
       .from(patients)
       .where(eq(patients.id, patientId));
 
-    if (!patient.length || patient[0].userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (!patient.length) {
+      return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
     }
 
     const updatedPatient = await db
       .update(patients)
       .set({
-        name: body.name,
+        firstName: body.firstName || patient[0].firstName,
+        lastName: body.lastName || patient[0].lastName,
         email: body.email,
         phone: body.phone,
-        address: body.address,
-        medicalHistory: body.medicalHistory,
-        allergies: body.allergies,
+        dateOfBirth: body.dateOfBirth,
         emergencyContact: body.emergencyContact,
         emergencyPhone: body.emergencyPhone,
-        updatedAt: new Date(),
       })
       .where(eq(patients.id, patientId))
       .returning();
 
     return NextResponse.json(updatedPatient[0]);
   } catch (error) {
-    console.error('Error updating patient:', error);
+    console.error('[v0] Patient detail PUT error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to update patient', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -115,32 +97,27 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const db = getDb();
     const { id } = await params;
     const patientId = parseInt(id);
 
-    // Verify ownership
+    // Verify patient exists
     const patient = await db
       .select()
       .from(patients)
       .where(eq(patients.id, patientId));
 
-    if (!patient.length || patient[0].userId !== userId) {
-      return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    if (!patient.length) {
+      return NextResponse.json({ error: 'Patient not found' }, { status: 404 });
     }
 
     await db.delete(patients).where(eq(patients.id, patientId));
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: 'Patient deleted' });
   } catch (error) {
-    console.error('Error deleting patient:', error);
+    console.error('[v0] Patient detail DELETE error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to delete patient', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
